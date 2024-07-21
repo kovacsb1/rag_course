@@ -1,6 +1,7 @@
 import logging
 import sys
 import os
+from IPython.display import Markdown, display
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -14,6 +15,14 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
 
+
+# define prompt viewing function
+def display_prompt_dict(prompts_dict):
+    for k, p in prompts_dict.items():
+        text_md = f"**Prompt Key**: {k}<br>" f"**Text:** <br>"
+        display(Markdown(text_md))
+        print(p.get_template())
+        display(Markdown("<br><br>"))
 
 logging.basicConfig(filename="llamalog.txt", level=logging.DEBUG)
 
@@ -43,5 +52,9 @@ else:
     index = load_index_from_storage(storage_context)
 
 query_engine = index.as_query_engine()
+
+prompts_dict = query_engine.get_prompts()
+display_prompt_dict(prompts_dict)
+
 response = query_engine.query("What did the author do growing up?")
 print(response)
