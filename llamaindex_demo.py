@@ -11,6 +11,8 @@ from llama_index.core import (
     load_index_from_storage,
 )
 from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core.retrievers import VectorIndexRetriever
+from llama_index.core.query_engine import RetrieverQueryEngine
 
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
@@ -51,10 +53,23 @@ else:
     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
     index = load_index_from_storage(storage_context)
 
-query_engine = index.as_query_engine()
+
+# configure retriever
+retriever = VectorIndexRetriever(
+    index=index,
+    similarity_top_k=3,
+)
+
+query_engine = RetrieverQueryEngine(
+    retriever=retriever
+)
 
 prompts_dict = query_engine.get_prompts()
 display_prompt_dict(prompts_dict)
 
 response = query_engine.query("What did the author do growing up?")
 print(response)
+
+print("Chunks used in creating the response:")
+for n in response.source_nodes:
+    print(n)
