@@ -9,6 +9,8 @@ from llama_index.core import (
     Settings,
     load_index_from_storage,
 )
+from llama_index.core.node_parser import SentenceSplitter
+
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
 
@@ -24,9 +26,15 @@ Settings.llm = Ollama(model="phi3", request_timeout=360.0)
 
 PERSIST_DIR = "./storage"
 if not os.path.exists(PERSIST_DIR):
+    # set chunking parameters
+    splitter = SentenceSplitter(
+        chunk_size=512,
+        chunk_overlap=20,
+    )
+     
     # load the documents and create the index
     documents = SimpleDirectoryReader("data").load_data()
-    index = VectorStoreIndex.from_documents(documents)
+    index = VectorStoreIndex.from_documents(documents, transformations=[splitter])
     # store it for later
     index.storage_context.persist(persist_dir=PERSIST_DIR)
 else:
