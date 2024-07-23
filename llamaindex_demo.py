@@ -1,17 +1,12 @@
 import logging
 import sys
 import os
-from IPython.display import Markdown, display
 
 from llama_index.core import (
-    VectorStoreIndex,
-    SimpleDirectoryReader,
     StorageContext,
     Settings,
     load_index_from_storage,
 )
-from llama_index.core.retrievers import VectorIndexRetriever
-from llama_index.core.query_engine import RetrieverQueryEngine
 
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
@@ -32,16 +27,7 @@ Settings.llm = Ollama(model="phi3", request_timeout=360.0)
 storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
 index = load_index_from_storage(storage_context)
 
-
-# configure retriever
-retriever = VectorIndexRetriever(
-    index=index,
-    similarity_top_k=3,
-)
-
-query_engine = RetrieverQueryEngine(
-    retriever=retriever
-)
+query_engine = index.as_query_engine(similarity_top_k=3)
 
 response = query_engine.query("What did the author do growing up?")
 print(response)
