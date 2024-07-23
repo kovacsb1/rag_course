@@ -16,15 +16,6 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
 
-
-# define prompt viewing function
-def display_prompt_dict(prompts_dict):
-    for k, p in prompts_dict.items():
-        text_md = f"**Prompt Key**: {k}<br>" f"**Text:** <br>"
-        display(Markdown(text_md))
-        print(p.get_template())
-        display(Markdown("<br><br>"))
-
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(filename="logs/llamalog.txt", level=logging.DEBUG)
 
@@ -51,9 +42,6 @@ retriever = VectorIndexRetriever(
 query_engine = RetrieverQueryEngine(
     retriever=retriever
 )
-
-prompts_dict = query_engine.get_prompts()
-display_prompt_dict(prompts_dict)
 
 response = query_engine.query("What did the author do growing up?")
 print(response)
