@@ -10,7 +10,6 @@ from llama_index.core import (
     Settings,
     load_index_from_storage,
 )
-from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core.query_engine import RetrieverQueryEngine
 
@@ -26,7 +25,10 @@ def display_prompt_dict(prompts_dict):
         print(p.get_template())
         display(Markdown("<br><br>"))
 
-logging.basicConfig(filename="llamalog.txt", level=logging.DEBUG)
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(filename="logs/llamalog.txt", level=logging.DEBUG)
+
+PERSIST_DIR = "./storage"
 
 # bge-base embedding model
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
@@ -35,23 +37,9 @@ Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
 Settings.llm = Ollama(model="phi3", request_timeout=360.0)
 
 
-PERSIST_DIR = "./storage"
-if not os.path.exists(PERSIST_DIR):
-    # set chunking parameters
-    splitter = SentenceSplitter(
-        chunk_size=512,
-        chunk_overlap=20,
-    )
-     
-    # load the documents and create the index
-    documents = SimpleDirectoryReader("data").load_data()
-    index = VectorStoreIndex.from_documents(documents, transformations=[splitter])
-    # store it for later
-    index.storage_context.persist(persist_dir=PERSIST_DIR)
-else:
-    # load the existing index
-    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-    index = load_index_from_storage(storage_context)
+# load the existing index
+storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
+index = load_index_from_storage(storage_context)
 
 
 # configure retriever
