@@ -8,15 +8,17 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
 
 import os
+import toml
 from dotenv import load_dotenv
 
 
-load_dotenv()
-PERSIST_DIR = os.environ.get("PERSIST_DIR")
-HF_EMBEDDING_MODEL_NAME = os.environ.get("HF_EMBEDDING_MODEL_NAME")
-OLLAMA_LLM = os.environ.get("OLLAMA_LLM")
+config = toml.load('config.toml')
+PERSIST_DIR = config["persistance"]["persist_dir"]
 
-SIMILARITY_TOP_K = int(os.environ.get("SIMILARITY_TOP_K"))
+HF_EMBEDDING_MODEL_NAME = config["chunking"]["hf_embedding_model_name"]
+SIMILARITY_TOP_K = config["retrieval"]["similarity_top_k"]
+
+OLLAMA_LLM = config["ollama"]["llm"]
 
 
 @cl.on_chat_start
