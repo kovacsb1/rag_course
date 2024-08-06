@@ -12,17 +12,21 @@ from llama_index.core import (
 
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from llama_index.llms.ollama import Ollama
+from llama_index.llms.azure_openai import AzureOpenAI
 
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(filename="logs/llamalog.txt", level=logging.DEBUG)
+
+load_dotenv()
 
 config = toml.load('config.toml')
 HF_EMBEDDING_MODEL_NAME = config["chunking"]["hf_embedding_model_name"]
 SIMILARITY_TOP_K = config["retrieval"]["similarity_top_k"]
 SPARSE_TOP_K = config["retrieval"]["sparse_top_k"]
 
-OLLAMA_LLM = config["ollama"]["llm"]
+AZURE_OPENAI_MODEL= config["openai"]["model"]
+AZURE_DEPLOYMENT_NAME = config["openai"]["azure_deployment"]
+API_VERSION = config["openai"]["api_version"]
 
 QDRANT_URL = config["qdrant"]["url"]
 QDRANT_PORT = config["qdrant"]["port"]
@@ -32,8 +36,15 @@ QDRANT_API_KEY = os.environ.get("QDRANT_API_KEY")
 # bge-base embedding model
 Settings.embed_model = HuggingFaceEmbedding(model_name=HF_EMBEDDING_MODEL_NAME)
 
-# ollama
-Settings.llm = Ollama(model=OLLAMA_LLM, request_timeout=360.0)
+# openAI
+llm = AzureOpenAI(
+    model=AZURE_OPENAI_MODEL,
+    deployment_name=AZURE_DEPLOYMENT_NAME,
+    api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+    azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
+    api_version=API_VERSION,
+)
+Settings.llm = llm
 
 
 # connect to the vectorDB

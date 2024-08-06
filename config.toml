@@ -10,8 +10,13 @@ chunk_overlap = 20
 similarity_top_k=3
 sparse_top_k=5
 
-[ollama]
-llm = "phi3"
+[openai]
+azure_deployment="starschema-gpt4o"
+api_version="2024-05-01-preview"
+model="gpt-4o"
+
+# [ollama]
+# llm = "phi3"
 
 # this is likely not available, change it to running qdrant IP
 [qdrant]
