@@ -20,6 +20,7 @@ logging.basicConfig(filename="logs/llamalog.txt", level=logging.DEBUG)
 config = toml.load('config.toml')
 HF_EMBEDDING_MODEL_NAME = config["chunking"]["hf_embedding_model_name"]
 SIMILARITY_TOP_K = config["retrieval"]["similarity_top_k"]
+SPARSE_TOP_K = config["retrieval"]["sparse_top_k"]
 
 OLLAMA_LLM = config["ollama"]["llm"]
 
@@ -42,10 +43,14 @@ vectordb_client = qdrant_client.QdrantClient(
     api_key=QDRANT_API_KEY,
 )
 
-vector_store = QdrantVectorStore(client=vectordb_client, collection_name=QDRANT_COLLECTION)
+vector_store = QdrantVectorStore(client=vectordb_client, collection_name=QDRANT_COLLECTION, enable_hybrid=True)
 index = VectorStoreIndex.from_vector_store(vector_store)
 
-query_engine = index.as_query_engine(similarity_top_k=SIMILARITY_TOP_K)
+query_engine = index.as_query_engine(
+    vector_store_query_mode="hybrid",
+    similarity_top_k=SIMILARITY_TOP_K,
+    sparse_top_k=SPARSE_TOP_K
+    )
 
 response = query_engine.query("What did the author do growing up?")
 print(response)

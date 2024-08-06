@@ -8,6 +8,7 @@ chunk_overlap = 20
 
 [retrieval]
 similarity_top_k=3
+sparse_top_k=5
 
 [ollama]
 llm = "phi3"
@@ -16,4 +17,4 @@ llm = "phi3"
 [qdrant]
 url="http://20.13.43.101"
 port=6333
-collection_name="first_collection"
+collection_name="hybrid_collection"

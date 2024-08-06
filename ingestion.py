@@ -47,7 +47,11 @@ vectordb_client = qdrant_client.QdrantClient(
     api_key=QDRANT_API_KEY,
 )
 # qdrant vector store
-vector_store = QdrantVectorStore(client=vectordb_client, collection_name=QDRANT_COLLECTION)
+vector_store = QdrantVectorStore(
+    client=vectordb_client, 
+    collection_name=QDRANT_COLLECTION,
+    enable_hybrid=True
+)
 
 # load documents
 documents = SimpleDirectoryReader(SOURCE_DIR).load_data()
