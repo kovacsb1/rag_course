@@ -1,6 +1,7 @@
 import logging
 import sys
 import os
+import toml
 from dotenv import load_dotenv
 
 from llama_index.core import (
@@ -15,13 +16,13 @@ from llama_index.llms.ollama import Ollama
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(filename="logs/llamalog.txt", level=logging.DEBUG)
 
-load_dotenv()
-PERSIST_DIR = os.environ.get("PERSIST_DIR")
+config = toml.load('config.toml')
+PERSIST_DIR = config["persistance"]["persist_dir"]
 
-HF_EMBEDDING_MODEL_NAME = os.environ.get("HF_EMBEDDING_MODEL_NAME")
-OLLAMA_LLM = os.environ.get("OLLAMA_LLM")
+HF_EMBEDDING_MODEL_NAME = config["chunking"]["hf_embedding_model_name"]
+SIMILARITY_TOP_K = config["retrieval"]["similarity_top_k"]
 
-SIMILARITY_TOP_K = int(os.environ.get("SIMILARITY_TOP_K"))
+OLLAMA_LLM = config["ollama"]["llm"]
 
 # bge-base embedding model
 Settings.embed_model = HuggingFaceEmbedding(model_name=HF_EMBEDDING_MODEL_NAME)

@@ -9,19 +9,19 @@ from llama_index.core.node_parser import SentenceSplitter
 import logging
 import os
 from dotenv import load_dotenv
+import toml
 
 # create log folder
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(filename="logs/ingest_log.txt", level=logging.DEBUG)
 
-load_dotenv()
-SOURCE_DIR = os.environ.get("SOURCE_DIR")
-PERSIST_DIR = os.environ.get("PERSIST_DIR")
+config = toml.load('config.toml')
+SOURCE_DIR = config["persistance"]["source_dir"]
+PERSIST_DIR = config["persistance"]["persist_dir"]
 
-HF_EMBEDDING_MODEL_NAME = os.environ.get("HF_EMBEDDING_MODEL_NAME")
-
-CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE"))
-CHUNK_OVERLAP = int(os.environ.get("CHUNK_OVERLAP"))
+HF_EMBEDDING_MODEL_NAME = config["chunking"]["hf_embedding_model_name"]
+CHUNK_SIZE = config["chunking"]["chunk_size"]
+CHUNK_OVERLAP = config["chunking"]["chunk_overlap"]
 
 
 # bge-base embedding model
