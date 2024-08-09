@@ -52,22 +52,27 @@ async def start():
     vector_store = QdrantVectorStore(client=vectordb_client, collection_name=QDRANT_COLLECTION, enable_hybrid=True)
     index = VectorStoreIndex.from_vector_store(vector_store)
 
-    query_engine = index.as_query_engine(
+    chat_engine = index.as_chat_engine(
         vector_store_query_mode="hybrid",
         similarity_top_k=SIMILARITY_TOP_K,
         sparse_top_k=SPARSE_TOP_K
     )
-    cl.user_session.set("query_engine", query_engine)
+    cl.user_session.set("chat_engine", chat_engine)
     
 
 @cl.on_message
 async def main(message: cl.Message):
     # Your custom logic goes here...
-    query_engine = cl.user_session.get("query_engine")
+    chat_engine = cl.user_session.get("chat_engine")
 
-    response = query_engine.query(message.content)
+    # create message object
+    msg = cl.Message(content="", author="Assistant")
 
-    # Send a response back to the user
-    await cl.Message(
-        content=response.response,
-    ).send()
+    res = await cl.make_async(chat_engine.stream_chat)(message.content)
+
+    # updated message object with streaming tokens
+    for token in res.response_gen:
+        await msg.stream_token(token)
+
+    print(res.source_nodes)
+    await msg.send()

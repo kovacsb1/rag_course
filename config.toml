@@ -22,4 +22,4 @@ model="gpt-4o"
 [qdrant]
 url="http://20.13.43.101"
 port=6333
-collection_name="hybrid_collection"
+collection_name="hybrid_test"
